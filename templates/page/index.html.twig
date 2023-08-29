@@ -1,0 +1,9 @@
+{% extends "base.html.twig" %}
+
+{% block body %}
+    <div class="btn-group-vertical" role="group" aria-label="...">
+    {% for tournament in tournaments %}
+        <a class="btn btn-default" href="{{ path('tournaments_slug', {slug: tournament.name}) }}">{{ tournament.name }}</a>
+    {% endfor %}
+    </div>
+{% endblock %}
