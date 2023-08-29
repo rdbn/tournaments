@@ -10,11 +10,13 @@
 > make down
 
 Общий список команд
-> make build
-> make migration
-> make fixtures
-> make composer
-> make init_db (migration + fixtures)
-> make init
-> make up
-> make down
+```
+make build
+make migration
+make fixtures
+make composer
+make init_db (migration + fixtures)
+make init
+make up
+make down
+```
