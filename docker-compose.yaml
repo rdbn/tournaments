@@ -3,7 +3,7 @@ version: '3'
 services:
   mysql:
     container_name: tournaments_mysql
-    image: percona/percona-server:latest
+    image: mysql:8.1
     ports:
       - "3306:3306"
     volumes:

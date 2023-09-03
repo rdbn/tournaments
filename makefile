@@ -6,6 +6,9 @@ build:
 migration:
 	$(exec_php) bin/console doctrine:migrations:migrate -n
 
+migration_generate:
+	$(exec_php) bin/console doctrine:migrations:generate
+
 fixtures:
 	$(exec_php) bin/console doctrine:fixtures:load -n
 

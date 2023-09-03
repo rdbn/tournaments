@@ -20,18 +20,4 @@ class TournamentRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Tournament::class);
     }
-
-    public function flush(Tournament $tournament): void
-    {
-        $em = $this->getEntityManager();
-        $em->persist($tournament);
-        $em->flush();
-    }
-
-    public function remove(Tournament $tournament): void
-    {
-        $em = $this->getEntityManager();
-        $em->remove($tournament);
-        $em->flush();
-    }
 }

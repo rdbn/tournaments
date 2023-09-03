@@ -20,32 +20,4 @@ class TeamRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Team::class);
     }
-
-    /**
-     * @param array $ids
-     * @return Team[]
-     */
-    public function findByInId(array $ids): array
-    {
-        $qb = $this->createQueryBuilder('t');
-        $qb
-            ->where($qb->expr()->in('t.id', ':ids'))
-            ->setParameter('ids', $ids)
-        ;
-        return $qb->getQuery()->getResult();
-    }
-
-    public function flush(Team $team): void
-    {
-        $em = $this->getEntityManager();
-        $em->persist($team);
-        $em->flush();
-    }
-
-    public function remove(Team $team): void
-    {
-        $em = $this->getEntityManager();
-        $em->remove($team);
-        $em->flush();
-    }
 }

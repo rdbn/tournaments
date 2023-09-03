@@ -23,7 +23,7 @@ class TournamentsService
             $teams = $this->repository->findAll();
             shuffle($teams);
         } else {
-            $teams = $this->repository->findByInId($tournament->getMatchTeams());
+            $teams = $this->repository->findBy(['id' => $tournament->getMatchTeams()]);
         }
 
         return $this->generator->generate($teams);

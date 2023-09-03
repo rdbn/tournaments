@@ -15,7 +15,7 @@ class TeamType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->add('name', TextType::class, [
-
+            'label' => false,
         ]);
     }
 

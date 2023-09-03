@@ -9,22 +9,24 @@ use App\Form\TournamentType;
 use App\Repository\TournamentRepository;
 use App\Service\Tournament\SlugService;
 use App\Service\Tournament\TournamentsService;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
 class TournamentController extends AbstractController
 {
-    public function __construct(private TournamentRepository $repository)
+    public function __construct(private TournamentRepository $repository, private EntityManagerInterface $em)
     {
     }
 
     #[Route('/', name: 'index')]
     public function index(): Response
     {
-        $tournaments = $this->repository->findBy([]);
+        $tournaments = $this->repository->findAll();
 
         return $this->render('page/index.html.twig', [
             'tournaments' => $tournaments,
@@ -34,11 +36,16 @@ class TournamentController extends AbstractController
     #[Route('/tournaments/', name: 'tournaments')]
     public function tournaments(Request $request): Response
     {
-        $form = $this->createForm(TournamentType::class, new Tournament());
+        $tournament = new Tournament();
+        $form = $this->createForm(TournamentType::class, $tournament);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->repository->flush($form->getData());
+            $tournament->setSlug(SlugService::createSlug($tournament->getName()));
+
+            $this->em->persist($tournament);
+            $this->em->flush();
+
             return $this->redirectToRoute('tournaments');
         }
 
@@ -53,7 +60,10 @@ class TournamentController extends AbstractController
     #[Route('/tournaments/{slug}', name: 'tournaments_slug')]
     public function tournamentsSlug(string $slug, TournamentsService $service): Response
     {
-        $tournament = $this->repository->findOneBy(['name' => SlugService::normalizeName($slug)]);
+        $tournament = $this->repository->findOneBy(['slug' => $slug]);
+        if ($tournament === null) {
+            throw new NotFoundHttpException('Tournament not found');
+        }
 
         return $this->render('page/tournamentsSlug.html.twig', [
             'tournament' => $tournament,
@@ -64,8 +74,13 @@ class TournamentController extends AbstractController
     #[Route('/tournaments/delete/{slug}', name: 'tournaments_delete')]
     public function tournamentsDelete(string $slug): RedirectResponse
     {
-        $tournament = $this->repository->findOneBy(['name' => SlugService::normalizeName($slug)]);
-        $this->repository->remove($tournament);
+        $tournament = $this->repository->findOneBy(['slug' => $slug]);
+        if ($tournament === null) {
+            throw new NotFoundHttpException('Tournament not found');
+        }
+
+        $this->em->remove($tournament);
+        $this->em->flush();
 
         return $this->redirectToRoute('tournaments');
     }

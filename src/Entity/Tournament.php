@@ -26,7 +26,10 @@ class Tournament
     #[ORM\Column(length: 255)]
     private string $name;
 
-    #[ORM\Column(type: 'json', length: 255)]
+    #[ORM\Column(length: 255)]
+    private string $slug;
+
+    #[ORM\Column(type: 'json')]
     private array $matchTeams = [];
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
@@ -54,6 +57,16 @@ class Tournament
     public function setName(string $name): void
     {
         $this->name = $name;
+    }
+
+    public function getSlug(): string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(string $slug): void
+    {
+        $this->slug = $slug;
     }
 
     public function getUpdatedAt(): \DateTimeImmutable
@@ -87,10 +100,5 @@ class Tournament
     public function setCreatedAt(\DateTimeImmutable $createdAt): void
     {
         $this->createdAt = $createdAt;
-    }
-
-    public function getSlug(): ?string
-    {
-        return SlugService::createSlug($this->name);
     }
 }

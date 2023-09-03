@@ -12,9 +12,4 @@ class SlugService
     {
         return preg_replace(self::SLUG_REG_EXP, '-', $tournamentName);
     }
-
-    public static function normalizeName(string $slug): string
-    {
-        return preg_replace('/-/', ' ', $slug);
-    }
 }

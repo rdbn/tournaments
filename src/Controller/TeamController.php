@@ -7,15 +7,17 @@ namespace App\Controller;
 use App\Entity\Team;
 use App\Form\TeamType;
 use App\Repository\TeamRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 
 class TeamController extends AbstractController
 {
-    public function __construct(private TeamRepository $repository)
+    public function __construct(private TeamRepository $repository, private EntityManagerInterface $em)
     {
     }
 
@@ -26,7 +28,9 @@ class TeamController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->repository->flush($form->getData());
+            $this->em->persist($form->getData());
+            $this->em->flush();
+
             return $this->redirectToRoute('teams');
         }
 
@@ -41,8 +45,12 @@ class TeamController extends AbstractController
     #[Route('/teams/delete/{id}', name: 'teams_delete')]
     public function teamsDelete(int $id): RedirectResponse
     {
-        $tournament = $this->repository->findOneBy(['id' => $id]);
-        $this->repository->remove($tournament);
+        $team = $this->repository->findOneBy(['id' => $id]);
+        if ($team === null) {
+            throw new NotFoundHttpException('Not fount team.');
+        }
+        $this->em->remove($team);
+        $this->em->flush();
 
         return $this->redirectToRoute('teams');
     }
